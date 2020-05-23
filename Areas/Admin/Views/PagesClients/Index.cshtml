@@ -1,0 +1,80 @@
+﻿@model IEnumerable<RegistrationApplication.Models.ViewModels.Clients.ClientVM>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+@if (TempData["SM"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SM"]
+    </div>
+}
+<p>
+    @Html.ActionLink("Новая заявка", "AddNewClient", "", new { @class = "btn btn-info" })
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.LastName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.MiddleName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.BirthDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DateRequest)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.LoanSum)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Image)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MiddleName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BirthDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateRequest)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LoanSum)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Image)
+            </td>
+            <td>
+                @Html.ActionLink("Редактировать", "Edit", new { id = item.Id }, new { @class = "btn btn-primary" })
+                @*@Html.ActionLink("Подробности .", "Details", new { id = item.Id }, new { @class = "btn btn-info" })*@
+                @Html.ActionLink("Удалить     .", "Delete", new { id = item.Id }, new { @class = "btn btn-danger delete" })
+            </td>
+        </tr>
+    }
+</table>
+
+@Html.ActionLink("Вернутся", "Index", "Dashboard", "Dashboard", new { @class = "btn btn-primary" })
+@section Scripts
+{
+    <script src="~/Content/MyJS/AddClient.js"></script>
+}

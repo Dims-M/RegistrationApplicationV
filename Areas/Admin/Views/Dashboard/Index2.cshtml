@@ -1,0 +1,84 @@
+﻿@model IEnumerable<RegistrationApplication.Models.ViewModels.Clients.ClientVM>
+
+@{
+    ViewBag.Title = "Dashboard";
+}
+
+<h2>Список всех заявок от клиентов</h2>
+
+@if (TempData["SM"] != null)
+{
+<div class="alert alert-success">
+    @TempData["SM"]
+</div>
+}
+
+<p>
+    @Html.ActionLink("Создать новую заявку", "AddClient", "", new { @class = "btn btn-success" })
+  
+</p>
+
+<table class="table">
+    <tr>
+        <th>
+            Номер
+        </th>
+        <th>
+            Фамилия
+        </th>
+        <th>
+            Имя
+        </th>
+        <th>
+            Отчество
+        </th>
+        <th>
+            День рождения
+        </th>
+        <th>
+            Сумма кредита
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DateRequest)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Image)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+<tr>
+    <th>
+        @Html.DisplayFor(modelItem => item.Id)
+    </th>
+    <td>
+        @Html.DisplayFor(modelItem => item.LastName)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.FirstName)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.MiddleName)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.BirthDate)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.LoanSum)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.DateRequest)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Image)
+    </td>
+    <td>
+        @Html.ActionLink("Редактировать", "EditClient", new { id = item.Id }, new { @class = "btn btn-primary" })
+        @Html.ActionLink("Подробно", "ClientDetails", new { id = item.Id }, new { @class = "btn btn-info" })
+        @Html.ActionLink("Удалить!", "DeleteClient", new { id = item.Id }, new { @class = "btn btn-danger" })
+    </td>
+</tr>
+}
+
+</table>
