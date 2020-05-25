@@ -1,4 +1,7 @@
-﻿using PagedList;
+﻿using CsQuery.ExtensionMethods;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Newtonsoft.Json;
+using PagedList;
 using RegistrationApplication.Models.Data;
 using RegistrationApplication.Models.Utilities;
 using RegistrationApplication.Models.ViewModels.Clients;
@@ -108,7 +111,6 @@ namespace RegistrationApplication.Areas.Admin.Controllers
                 //День рождения и сумма заявки
                 clientDto.birthDate = model.BirthDate;
                 clientDto.loanSum = model.LoanSum;
-                clientDto.email = model.Email;
 
                 //Присваиваем оставщися знчения модели.
                 DateTime date1 = DateTime.Now;
@@ -206,7 +208,7 @@ namespace RegistrationApplication.Areas.Admin.Controllers
             #endregion
 
             //переодрисовать пользователя
-            return RedirectToAction("GetAllClients");
+            return RedirectToAction("Index");
         }
 
         /// <summary>
@@ -288,10 +290,12 @@ namespace RegistrationApplication.Areas.Admin.Controllers
             string pathDoc = pathString3;
 
             //workingWord.GetBoxCreateWord(pathString3, id.ToString());
+            var tempRezul = PrintDocPdf(id);
 
-            workingWord.GetBoxCreateWord(PrintDocPdf(id),pathString3, id.ToString());
+            //Запись в документ ворд
+            workingWord.GetBoxCreateWord(tempRezul, pathString3, id.ToString());
             //Тестовой метод
-            PrintDocPdf(id);
+            //PrintDocPdf(id); // печать документов
 
             // Тип файла - content-type
             string file_type = "application/docx";
@@ -308,26 +312,33 @@ namespace RegistrationApplication.Areas.Admin.Controllers
         /// Печать документов
         /// </summary>
         /// <returns></returns>
-        public string PrintDocPdf( int id)
+        public string[] PrintDocPdf( int id)
         {
             //модель или лист для хранения
-            Client list = new Client();
-            string[] listDoc = new string[10]; 
-
+            Client Clinentlist = new Client();
+        
             // Подклбчение к бд и поиск по id
             using (DBContext db = new DBContext())
             {
-                list = db.clients.Find(id); 
+                Clinentlist = db.clients.Find(id);
+               
             }
-            
-            
-            
-            // заполнение листа данными о клиенте
-            list.ToString();
+            string[] listDoc2= new string[]
+            {
+                $"Номер заявки {Clinentlist.Id}",
+                $"ФАМИЛИЯ: {Clinentlist.lastName}",
+                $"ИМЯ: {Clinentlist.firstName}",
+                $"ОТЧЕСВТО: {Clinentlist.middleName}",
+                $"ДАТА РОЖДЕНИЯ: {Clinentlist.birthDate}",
+                $"ПОЧТА: {Clinentlist.email}",
+                $"СУММА КРЕДИТА: {Clinentlist.loanSum.ToString()}",
+                $"ДАТА ЗАЯВКИ: {Clinentlist.dateRequest}",
+                $"КАРТИНКА:\n{Clinentlist.image}"
+            };
             // отправка готового массива в контролер печати
+            return listDoc2;
 
-
-            return (list.ToString());
+            
         }
 
         // GET: Admin/PagesClients/EditClient
