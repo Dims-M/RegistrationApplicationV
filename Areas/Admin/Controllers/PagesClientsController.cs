@@ -179,19 +179,21 @@ namespace RegistrationApplication.Areas.Admin.Controllers
 
                 //переменная для хранения имени изображения
                 string imageName = file.FileName;
+                int idDocWord = id;
 
                 //сохранить изображение в модель DTO
                 using (DBContext db = new DBContext())
                 {
                     Client dto = db.clients.Find(id);
                     dto.image = imageName;
-
+                    
                     db.SaveChanges();
                 }
 
                 //Назначить пути к оригинальному и уменьшеному изабражению
                 var path = string.Format($"{pathString2}\\{imageName}");
                 var path2 = string.Format($"{pathString3}\\{imageName}"); // уменьшенное изображене 
+                var path3 = string.Format($"{pathString3}\\{idDocWord}"); // уменьшенное изображене 
 
                 //сохранить оригинальное изображение
                 file.SaveAs(path);
@@ -201,6 +203,7 @@ namespace RegistrationApplication.Areas.Admin.Controllers
                 WebImage img = new WebImage(file.InputStream);
                 img.Resize(200, 200); //Ширина, высота сохраненного изображения.
                 img.Save(path2); // Куда сохраняем уменьшенное изображение
+                img.Save(path3); // Куда сохраняем уменьшенное изображение для документа
 
 
             }
@@ -282,35 +285,28 @@ namespace RegistrationApplication.Areas.Admin.Controllers
                 Directory.CreateDirectory(pathString2);
             if (!Directory.Exists(pathString3))
                 Directory.CreateDirectory(pathString3);
-            
-            // Путь к файлу
-            // string file_path = Server.MapPath("~/Archive_Documents/TestSaveDoc.docx");
-            string file_path = Server.MapPath("~/Archive_Documents/TestSaveDoc.docx");
+       
+            // Тип файла - content-type
+            string file_type = "application/docx";
+            // Имя файла - необязательно
+            string TestSaveDoc = $@"{pathString3}\\Result_Client_{id}.docx";
 
-            string pathDoc = pathString3;
-
-            //workingWord.GetBoxCreateWord(pathString3, id.ToString());
+            //Массив с данными
             var tempRezul = PrintDocPdf(id);
 
             //Запись в документ ворд
             workingWord.GetBoxCreateWord(tempRezul, pathString3, id.ToString());
-            //Тестовой метод
-            //PrintDocPdf(id); // печать документов
 
-            // Тип файла - content-type
-            string file_type = "application/docx";
-            // Имя файла - необязательно
-            string TestSaveDoc = $@"{pathString3}\\Result_Client{id}.docx";
-            //return File(pathString3, file_type, TestSaveDoc);
+
+            //Отправляем готовый документ клиенту
             return File(TestSaveDoc, file_type, $"Сustomer_card№{id}.docx");
 
         }
 
-
-
         /// <summary>
-        /// Печать документов
+        /// Формирования массива с даными для записи в новый документ форд
         /// </summary>
+        /// <param name="id">id клиента. Поиск по БД</param>
         /// <returns></returns>
         public string[] PrintDocPdf( int id)
         {
@@ -333,7 +329,8 @@ namespace RegistrationApplication.Areas.Admin.Controllers
                 $"ПОЧТА: {Clinentlist.email}",
                 $"СУММА КРЕДИТА: {Clinentlist.loanSum.ToString()}",
                 $"ДАТА ЗАЯВКИ: {Clinentlist.dateRequest}",
-                $"КАРТИНКА:\n{Clinentlist.image}"
+                $"КАРТИНКА:\n{Clinentlist.image}",
+                $"#IMAGE"
             };
             // отправка готового массива в контролер печати
             return listDoc2;

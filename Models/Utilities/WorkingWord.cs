@@ -13,19 +13,18 @@ namespace RegistrationApplication.Models.Utilities
     /// </summary>
     public class WorkingWord
     {
-        /// <summary>
-        /// Создание Ворд документа
-        /// </summary>
-        /// <param name="paht"></param>
+       /// <summary>
+       /// Создание документа форд
+       /// </summary>
+       /// <param name="client">Массив с данными. для записи в Word</param>
+       /// <param name="paht">paht Путь к файлу. Куда сохранять</param>
+       /// <param name="nameClient">Имя клиента </param>
         public void GetBoxCreateWord(string[] client, string paht , string nameClient = "Client")
         {
             string hedstr = @"
-            Касса №1 — сеть центров выдачи займов!
-            kassaone.ru
-            Сеть центров по выдаче денежных займов размещает условия предоставления денежных средств частным лицам."+ Environment.NewLine;
-
-           // string[] temZnach = new string[] { hedstr, "Фамилия клиента:", "Имя отчество:", "Год рождения", "Сумма кредита:","Дата заявки:","ТУТ должна быть картинка!!" };
-          //  string temp = hedstr + client;
+Касса №1 — сеть центров выдачи займов!
+kassaone.ru
+Сеть центров по выдаче денежных займов размещает условия предоставления денежных средств частным лицам."+ Environment.NewLine;
 
             // создание ссылок дирикторий(папок для картинки). Корневая папка
             var originalDirectory = new DirectoryInfo(string.Format(@"~Archive_Documents\\Uploads"));
@@ -36,27 +35,32 @@ namespace RegistrationApplication.Models.Utilities
             // Создание нового дока.
             var document = new DocumentModel();
 
-           // string[] array = client.Select(n => n.ToString()).ToArray();
             try
             {
-                
                 //Цикл для массивов
                 for (int i = 0; i < client.Length; i++)
                 {
+                    hedstr += (client[i] + Environment.NewLine);
+                };
 
-                hedstr += (client[i] + Environment.NewLine);
                 document.Content.LoadText(hedstr);
 
-                };
-               // document.Content.LoadText(hedstr);
+                document.Save(paht + $@"\\Result_Client_{nameClient}.docx");
 
-                document.Save(paht +$@"\\Result_Client{nameClient}.docx");
-                //document.Save("Archive_Documents/TestSaveDoc.pdf");
+                //поиск и замена Картинки.
+                ContentRange imagePlaceholder = document.Content.Find("#IMAGE").First();
+              
+                // Create and add new Picture element content.
+              //  imagePlaceholder.Set(new Picture(document, paht + $"\\5.jpg").Content);
+                imagePlaceholder.Set(new Picture(document, paht + $"\\{nameClient}.jpg").Content);
+
+             document.Save(paht + $@"\\Result_Client_{nameClient}.docx");
 
             }
+
             catch (Exception ex)
             {
-                //Console.WriteLine("Ошибка при работе" + ex);
+                //для лога ошибок
             }
         }
 

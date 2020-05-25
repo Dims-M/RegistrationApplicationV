@@ -30,7 +30,7 @@ namespace RegistrationApplication.Areas.Admin.Controllers
 
         public ActionResult ToDoClient()
         {
-            return Redirect("/Admin/PagesClients/GetAllClients");
+            return Redirect("/Admin/PagesClients/AddNewClient");
             return Redirect("Dashboard/Index");
         }
 
