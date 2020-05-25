@@ -7,13 +7,13 @@ namespace RegistrationApplication.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class AddColonEmail : IMigrationMetadata
+    public sealed partial class AddImage : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddColonEmail));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddImage));
         
         string IMigrationMetadata.Id
         {
-            get { return "202005221107451_AddColonEmail"; }
+            get { return "202005251417067_AddImage"; }
         }
         
         string IMigrationMetadata.Source

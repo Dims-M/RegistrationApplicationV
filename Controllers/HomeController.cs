@@ -18,7 +18,7 @@ namespace RegistrationApplication.Controllers
         {
 
             //Переадресуем а админку
-            return Redirect("/Admin/PagesClients/GetAllClients");
+            return Redirect("/Admin/PagesClients/AddNewClient");
         }
 
         public ActionResult Cabinet()

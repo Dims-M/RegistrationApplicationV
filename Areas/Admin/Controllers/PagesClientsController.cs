@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
+using System.Web.DynamicData;
 using System.Web.Helpers;
 using System.Web.Mvc;
 
@@ -180,16 +181,7 @@ namespace RegistrationApplication.Areas.Admin.Controllers
                 //переменная для хранения имени изображения
                 string imageName = file.FileName;
                 int idDocWord = id;
-
-                //сохранить изображение в модель DTO
-                using (DBContext db = new DBContext())
-                {
-                    Client dto = db.clients.Find(id);
-                    dto.image = imageName;
-                    
-                    db.SaveChanges();
-                }
-
+             
                 //Назначить пути к оригинальному и уменьшеному изабражению
                 var path = string.Format($"{pathString2}\\{imageName}");
                 var path2 = string.Format($"{pathString3}\\{imageName}"); // уменьшенное изображене 
@@ -205,13 +197,23 @@ namespace RegistrationApplication.Areas.Admin.Controllers
                 img.Save(path2); // Куда сохраняем уменьшенное изображение
                 img.Save(path3); // Куда сохраняем уменьшенное изображение для документа
 
+                //сохранить изображение в модель DTO
+                using (DBContext db = new DBContext())
+                {
+                    string tempPath = $"{path3}\\{imageName}";
 
+                    Client dto = db.clients.Find(id);
+                    dto.image = imageName;
+                    dto.imagePathInDoc = tempPath; // сохраняем путь к файлу
+
+                    db.SaveChanges();
+                }
             }
 
             #endregion
 
             //переодрисовать пользователя
-            return RedirectToAction("Index");
+            return RedirectToAction("GetAllClients");
         }
 
         /// <summary>
@@ -299,7 +301,7 @@ namespace RegistrationApplication.Areas.Admin.Controllers
 
 
             //Отправляем готовый документ клиенту
-            return File(TestSaveDoc, file_type, $"Сustomer_card№{id}.docx");
+           return File(TestSaveDoc, file_type, $"Сustomer_card№{id}.docx");
 
         }
 
@@ -482,22 +484,16 @@ namespace RegistrationApplication.Areas.Admin.Controllers
                     file3.Delete();
                 }
 
-                //сохраняем изображение
+                ////сохраняем изображение
                 string  imageName = file.FileName;
-
-                using (DBContext db = new DBContext())
-                {
-                    Client dto = db.clients.Find(id);
-                    dto.image = imageName;
-
-                    db.SaveChanges(); //save DB
-                }
+                int idDocWord = id;
 
                 //сохраняемм оригинал и превью картинки
                 //Назначить пути к оригинальному и уменьшеному изабражению
                 var path = string.Format($"{pathString1}\\{imageName}");
                 var path2 = string.Format($"{pathString2}\\{imageName}"); // уменьшенное изображене 
-
+                var path3 = string.Format($"{pathString2}\\{idDocWord}"); // уменьшенное изображене
+                
                 //сохранить оригинальное изображение
                 file.SaveAs(path);
 
@@ -506,6 +502,19 @@ namespace RegistrationApplication.Areas.Admin.Controllers
                 WebImage img = new WebImage(file.InputStream);
                 img.Resize(200, 200); //Ширина, высота сохраненного изображения.
                 img.Save(path2); // Куда сохраняем уменьшенное изображение
+                img.Save(path3); // Куда сохраняем уменьшенное изображение для документа
+
+
+
+                using (DBContext db = new DBContext())
+                {
+                    string tempPath = $"{path3}\\{imageName}";
+                    Client dto = db.clients.Find(id);
+                    dto.image = imageName;
+                    
+                    dto.imagePathInDoc = tempPath; // сохраняем путь к файлу
+                    db.SaveChanges(); //save DB
+                }
 
 
             }
@@ -537,7 +546,8 @@ namespace RegistrationApplication.Areas.Admin.Controllers
             //удаляем категории с картинками
             var originalDirectory = new DirectoryInfo(string.Format($"{Server.MapPath(@"\")}Images\\Uploads"));
             //Путь к  папка для хранения уменьшеной копии
-            var pathString = Path.Combine(originalDirectory.ToString(), "Clients\\" + id.ToString() + "\\Thumds");
+           // var pathString = Path.Combine(originalDirectory.ToString(), "Clients\\" + id.ToString() + "\\Thumds");
+            var pathString = Path.Combine(originalDirectory.ToString(), "Clients\\" + id.ToString());
 
             if (Directory.Exists(pathString))
                 Directory.Delete(pathString,true);

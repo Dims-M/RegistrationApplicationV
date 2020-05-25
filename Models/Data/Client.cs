@@ -34,7 +34,10 @@ namespace RegistrationApplication.Models.Data
         public int loanSum { get; set; }
 
         public string email { get; set; }
+
         public string image { get; set; }
+
+        public string imagePathInDoc { get; set; }
 
     }
 }

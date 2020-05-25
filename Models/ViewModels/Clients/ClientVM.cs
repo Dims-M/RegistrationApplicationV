@@ -34,6 +34,7 @@ namespace RegistrationApplication.Models.ViewModels.Clients
             LoanSum = row.loanSum;
             Email = row.email;
             Image = row.image;
+            ImagePathInDoc = row.imagePathInDoc;
             DateRequest = row.dateRequest;
         }
 
@@ -77,6 +78,8 @@ namespace RegistrationApplication.Models.ViewModels.Clients
 
         [Display(Name = "Логотип, картинка, Аватар")]
         public string Image { get; set; }
+
+        public string ImagePathInDoc { get; set; }
 
         /// <summary>
         /// Свойство для работы с колекциями изображений

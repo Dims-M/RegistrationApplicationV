@@ -3,16 +3,16 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class AddColonEmail : DbMigration
+    public partial class AddImage : DbMigration
     {
         public override void Up()
         {
-            AddColumn("dbo.tbClient", "email", c => c.String());
+            AddColumn("dbo.tbClient", "imagePathInDoc", c => c.String());
         }
         
         public override void Down()
         {
-            DropColumn("dbo.tbClient", "email");
+            DropColumn("dbo.tbClient", "imagePathInDoc");
         }
     }
 }
