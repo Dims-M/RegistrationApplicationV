@@ -68,15 +68,7 @@ namespace RegistrationApplication.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult AddNewClient(ClientVM model, HttpPostedFileBase file) 
         {
-
-            //if (file.GetType() == typeof(HttpPostedFileWrapper))
-            //{
-            //    return View(model); // Возращаем модель на форму
-            //}
-
             //проверяем модель на валидность.
-
-
             if (!ModelState.IsValid)
             {
                      return View (model); // Возращаем модель на форму
@@ -116,6 +108,7 @@ namespace RegistrationApplication.Areas.Admin.Controllers
                 //Присваиваем оставщися знчения модели.
                 DateTime date1 = DateTime.Now;
                 clientDto.dateRequest = date1.ToString("d");
+                clientDto.email = model.Email;
 
                 //сохраняем модель в БД
                 db.clients.Add(clientDto);
@@ -133,6 +126,8 @@ namespace RegistrationApplication.Areas.Admin.Controllers
 
             // создание ссылок дирикторий(папок для картинки). Корневая папка
             var originalDirectory = new DirectoryInfo(string.Format($"{Server.MapPath(@"\")}Images\\Uploads"));
+            var originalDirectory2 = new DirectoryInfo(string.Format($"{Server.MapPath(@"\")}Archive_Documents\\"));
+
 
             ////Создается папка к кажому новому клиенту(по id).
             var pathString1 = Path.Combine(originalDirectory.ToString(), "Clients"); 
@@ -141,6 +136,10 @@ namespace RegistrationApplication.Areas.Admin.Controllers
             var pathString3 = Path.Combine(originalDirectory.ToString(), "Clients\\"+id.ToString()+"\\Thumds");
             var pathString4 = Path.Combine(originalDirectory.ToString(), "Clients\\"+id.ToString()+"\\Gallery");
             var pathString5 = Path.Combine(originalDirectory.ToString(), "Clients\\"+id.ToString()+ "\\Gallery\\Thumds");
+
+            //Создается папка дл хранения уменьшеной копии
+            var pathString6 = Path.Combine(originalDirectory2.ToString(), "DocsClient\\" + id.ToString() + "\\Document");
+
 
             //Проверяем наличие директории (если нет, создаем)
             if (!Directory.Exists(pathString1))
@@ -153,6 +152,8 @@ namespace RegistrationApplication.Areas.Admin.Controllers
                 Directory.CreateDirectory(pathString4);
             if (!Directory.Exists(pathString5))
                 Directory.CreateDirectory(pathString5);
+            if (!Directory.Exists(pathString6))
+                Directory.CreateDirectory(pathString6);
 
             //Проверяем был ли файл загружен.
             if (file != null && file.ContentLength > 0)
@@ -270,7 +271,7 @@ namespace RegistrationApplication.Areas.Admin.Controllers
         {
             workingWord = new WorkingWord(); // сохранение файлов на диске
 
-            // создание ссылок дирикторий(папок для картинки). Корневая папка
+            // создание ссылок дирикторий(папок для документов). Корневая папка
             var originalDirectory = new DirectoryInfo(string.Format($"{Server.MapPath(@"\")}Archive_Documents\\"));
 
             ////Создается папка к кажому новому клиенту(по id).
@@ -464,16 +465,23 @@ namespace RegistrationApplication.Areas.Admin.Controllers
                 //устанавливаем пути загрузки
                 // создание ссылок дирикторий(папок для картинки). Корневая папка
                 var originalDirectory = new DirectoryInfo(string.Format($"{Server.MapPath(@"\")}Images\\Uploads"));
+                var originalDirectory2 = new DirectoryInfo(string.Format($"{Server.MapPath(@"\")}Archive_Documents\\DocsClient"));
+
 
                 ////путь к папке и кажому новому клиенту(по id).
                 var pathString1 = Path.Combine(originalDirectory.ToString(), "Clients\\" + id.ToString());
                 //Путь к  папка для хранения уменьшеной копии
                 var pathString2 = Path.Combine(originalDirectory.ToString(), "Clients\\" + id.ToString() + "\\Thumds");
 
+                // папки хранения документов Ворд
+                var pathString3 = Path.Combine(originalDirectory2.ToString(), id.ToString());
+
                 //удаляем существуешие старые файлы  и директории. 
                 DirectoryInfo dir1 = new DirectoryInfo(pathString1);
                 DirectoryInfo dir2 = new DirectoryInfo(pathString2);
+                DirectoryInfo dir3 = new DirectoryInfo(pathString3);
 
+                //Удаляем подпапки
                 foreach (var file2 in dir1.GetFiles())
                 {
                     file2.Delete();
@@ -482,6 +490,11 @@ namespace RegistrationApplication.Areas.Admin.Controllers
                 foreach (var file3 in dir2.GetFiles())
                 {
                     file3.Delete();
+                }
+
+                foreach (var file4 in dir3.GetFiles())
+                {
+                    file4.Delete();
                 }
 
                 ////сохраняем изображение
@@ -545,12 +558,31 @@ namespace RegistrationApplication.Areas.Admin.Controllers
 
             //удаляем категории с картинками
             var originalDirectory = new DirectoryInfo(string.Format($"{Server.MapPath(@"\")}Images\\Uploads"));
+            var originalDirectory2 = new DirectoryInfo(string.Format($"{Server.MapPath(@"\")}Archive_Documents\\DocsClient"));
+            
             //Путь к  папка для хранения уменьшеной копии
-           // var pathString = Path.Combine(originalDirectory.ToString(), "Clients\\" + id.ToString() + "\\Thumds");
+            // var pathString = Path.Combine(originalDirectory.ToString(), "Clients\\" + id.ToString() + "\\Thumds");
             var pathString = Path.Combine(originalDirectory.ToString(), "Clients\\" + id.ToString());
 
+            var pathString2 = Path.Combine(originalDirectory2.ToString(), id.ToString());
+
+            DirectoryInfo dir3 = new DirectoryInfo(pathString2);
+            DirectoryInfo dir4 = new DirectoryInfo(pathString);
+
+            foreach (var file4 in dir3.GetFiles())
+            {
+                file4.Delete();
+            }
+            foreach (var file5 in dir4.GetFiles())
+            {
+                file5.Delete();
+            }
+
             if (Directory.Exists(pathString))
-                Directory.Delete(pathString,true);
+                Directory.Delete(pathString, true);
+
+            if (Directory.Exists(pathString2))
+                Directory.Delete(pathString2,true);
 
             //Переодрисовать пользователя
             return RedirectToAction("GetAllClients");
