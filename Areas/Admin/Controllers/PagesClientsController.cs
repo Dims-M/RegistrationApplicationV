@@ -118,8 +118,7 @@ namespace RegistrationApplication.Areas.Admin.Controllers
 
             }
 
-            //Сообщение пользователю. с помощью темп дата
-            TempData["SM"] = "Заявка успешно оформлена!";
+           
 
             // ЗАГРУЗКА ФАЙЛА
             #region Загрузка файла
@@ -186,7 +185,7 @@ namespace RegistrationApplication.Areas.Admin.Controllers
                 //Назначить пути к оригинальному и уменьшеному изабражению
                 var path = string.Format($"{pathString2}\\{imageName}");
                 var path2 = string.Format($"{pathString3}\\{imageName}"); // уменьшенное изображене 
-                var path3 = string.Format($"{pathString3}\\{idDocWord}"); // уменьшенное изображене 
+                var path3 = string.Format($"{pathString3}"); // уменьшенное изображене 
 
                 //сохранить оригинальное изображение
                 file.SaveAs(path);
@@ -213,6 +212,8 @@ namespace RegistrationApplication.Areas.Admin.Controllers
 
             #endregion
 
+            //Сообщение пользователю. с помощью темп дата
+            TempData["SM"] = "Заявка успешно оформлена!";
             //переодрисовать пользователя
             return RedirectToAction("GetAllClients");
         }
@@ -298,7 +299,7 @@ namespace RegistrationApplication.Areas.Admin.Controllers
             var tempRezul = PrintDocPdf(id);
 
             //Запись в документ ворд
-            workingWord.GetBoxCreateWord(tempRezul, pathString3, id.ToString());
+            workingWord.GetBoxCreateWord(tempRezul, pathString3, id);
 
 
             //Отправляем готовый документ клиенту
@@ -547,6 +548,37 @@ namespace RegistrationApplication.Areas.Admin.Controllers
        [HttpGet]
         public ActionResult DeleteClient(int id)
         {
+            try
+            {
+
+            //удаляем категории с картинками
+            var originalDirectory = new DirectoryInfo(string.Format($"{Server.MapPath(@"\")}Images\\Uploads"));
+            var originalDirectory2 = new DirectoryInfo(string.Format($"{Server.MapPath(@"\")}Archive_Documents\\DocsClient"));
+            
+            //Путь к  папка для хранения уменьшеной копии
+            // var pathString = Path.Combine(originalDirectory.ToString(), "Clients\\" + id.ToString() + "\\Thumds");
+           
+            var pathString = Path.Combine(originalDirectory.ToString(), "Clients\\" + id.ToString());
+            var pathString2 = Path.Combine(originalDirectory2.ToString(), id.ToString());
+
+            DirectoryInfo dir3 = new DirectoryInfo(pathString2);
+            DirectoryInfo dir4 = new DirectoryInfo(pathString);
+
+            //foreach (var file3 in dir3.GetFiles())
+            //{
+            //    file3.Delete();
+            //}
+            //foreach (var file5 in dir4.GetFiles())
+            //{
+            //    file5.Delete();
+            //}
+
+            if (Directory.Exists(pathString))
+                Directory.Delete(pathString, true);
+
+            if (Directory.Exists(pathString2))
+                Directory.Delete(pathString2,true);
+
             //Удаляем товар из БД
             using (DBContext db = new DBContext())
             {
@@ -556,33 +588,12 @@ namespace RegistrationApplication.Areas.Admin.Controllers
                 db.SaveChanges();
             }
 
-            //удаляем категории с картинками
-            var originalDirectory = new DirectoryInfo(string.Format($"{Server.MapPath(@"\")}Images\\Uploads"));
-            var originalDirectory2 = new DirectoryInfo(string.Format($"{Server.MapPath(@"\")}Archive_Documents\\DocsClient"));
-            
-            //Путь к  папка для хранения уменьшеной копии
-            // var pathString = Path.Combine(originalDirectory.ToString(), "Clients\\" + id.ToString() + "\\Thumds");
-            var pathString = Path.Combine(originalDirectory.ToString(), "Clients\\" + id.ToString());
-
-            var pathString2 = Path.Combine(originalDirectory2.ToString(), id.ToString());
-
-            DirectoryInfo dir3 = new DirectoryInfo(pathString2);
-            DirectoryInfo dir4 = new DirectoryInfo(pathString);
-
-            foreach (var file4 in dir3.GetFiles())
-            {
-                file4.Delete();
             }
-            foreach (var file5 in dir4.GetFiles())
+            catch (Exception ex)
             {
-                file5.Delete();
+
             }
 
-            if (Directory.Exists(pathString))
-                Directory.Delete(pathString, true);
-
-            if (Directory.Exists(pathString2))
-                Directory.Delete(pathString2,true);
 
             //Переодрисовать пользователя
             return RedirectToAction("GetAllClients");
