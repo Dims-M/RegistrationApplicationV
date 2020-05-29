@@ -28,10 +28,9 @@ namespace RegistrationApplication.Models.Utilities
         //    {
 
         //    //от кого
-        //    MailAddress from = new MailAddress("o.avto@i-cks.ru", "Информационное оповещение");
+        //    MailAddress from = new MailAddress("MYmAIL", "Информационное оповещение");
 
         //    //кому
-        //    //MailAddress to = new MailAddress("o.avto@i-cks.ru");
         //    MailAddress to = new MailAddress(Toemail);
 
         //    MailMessage m = new MailMessage(from, to);
@@ -49,7 +48,7 @@ namespace RegistrationApplication.Models.Utilities
         //    //настройки электронного ящика
         //    SmtpClient smtp = new SmtpClient("smtp.mail.ru", 2525);
         //    //Логин и Пароль от почты
-        //    smtp.Credentials = new NetworkCredential("o.avto@i-cks.ru", "51215045avto");
+        //    smtp.Credentials = new NetworkCredential("lOGIN Email(сама почта)", "Pass");
 
         //    // Использовать ли защиту  Ssl
         //   smtp.EnableSsl = true;

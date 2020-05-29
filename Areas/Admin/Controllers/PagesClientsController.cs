@@ -118,8 +118,6 @@ namespace RegistrationApplication.Areas.Admin.Controllers
 
             }
 
-           
-
             // ЗАГРУЗКА ФАЙЛА
             #region Загрузка файла
 
@@ -253,6 +251,8 @@ namespace RegistrationApplication.Areas.Admin.Controllers
             // через ViewBag отправляем в представления
             ViewBag.onePageOfClients = onePageOfClients;
 
+            //ViewBag.stringBase64PrinPDF = WorkingWord.ConverdToBase64String();
+
             // Получаем имя директории
             string t = originalDirectory.ToString();
            // tempDoc = t;
@@ -294,6 +294,7 @@ namespace RegistrationApplication.Areas.Admin.Controllers
             string file_type = "application/docx";
             // Имя файла - необязательно
             string TestSaveDoc = $@"{pathString3}\\Result_Client_{id}.docx";
+            string TestSaveDocPDF = $@"{pathString3}\\Result_Client_{id}.pdf";
 
             //Массив с данными
             var tempRezul = PrintDocPdf(id);
@@ -301,6 +302,7 @@ namespace RegistrationApplication.Areas.Admin.Controllers
             //Запись в документ ворд
             workingWord.GetBoxCreateWord(tempRezul, pathString3, id);
 
+          //  workingWord.ConverdToBase64String(TestSaveDocPDF);
 
             //Отправляем готовый документ клиенту
            return File(TestSaveDoc, file_type, $"Сustomer_card№{id}.docx");
@@ -555,9 +557,6 @@ namespace RegistrationApplication.Areas.Admin.Controllers
             var originalDirectory = new DirectoryInfo(string.Format($"{Server.MapPath(@"\")}Images\\Uploads"));
             var originalDirectory2 = new DirectoryInfo(string.Format($"{Server.MapPath(@"\")}Archive_Documents\\DocsClient"));
             
-            //Путь к  папка для хранения уменьшеной копии
-            // var pathString = Path.Combine(originalDirectory.ToString(), "Clients\\" + id.ToString() + "\\Thumds");
-           
             var pathString = Path.Combine(originalDirectory.ToString(), "Clients\\" + id.ToString());
             var pathString2 = Path.Combine(originalDirectory2.ToString(), id.ToString());
 
@@ -594,16 +593,126 @@ namespace RegistrationApplication.Areas.Admin.Controllers
 
             }
 
-
-            //Переодрисовать пользователя
+            //Переодресовать пользователя
             return RedirectToAction("GetAllClients");
 
         }
 
+        /// <summary>
+        /// Метод отправки письма клиенту.
+        /// </summary>
+        /// <param name="id">Id клиента</param>
+        /// <returns></returns>
+        public ActionResult SendMailClient(int id)
+        {
+            WorkMail workMail = new WorkMail();
+            string emailClienta;
+            workingWord = new WorkingWord();
+
+            // создание ссылок дирикторий(папок для документов). Корневая папка
+            var originalDirectoryWordDoc = new DirectoryInfo(string.Format($"{Server.MapPath(@"\")}Archive_Documents\\"));
+
+            //Создается папка дл хранения дока
+            var pathString3 = Path.Combine(originalDirectoryWordDoc.ToString(), "DocsClient\\" + id.ToString() + "\\Document\\");
+
+            string TestSaveDoc = $@"{pathString3}Result_Client_{id}.docx";
+            //Массив с данными
+            var tempRezul = PrintDocPdf(id);
+
+            //Запись в документ ворд
+            workingWord.GetBoxCreateWord(tempRezul, pathString3, id);
+          
+            //лист для хранения клиентов
+            List<ClientVM> listOfClientVM;
+            int page = 1;
+
+            //установить номер старницы
+            var pageNumber = page ; // Если в  перемнной page Будет значение null. То по умолчанию устновится страница 1
+            using (DBContext db = new DBContext())
+            {
+                Client client = new Client();
+                client = db.clients.Find(id);
+                emailClienta = client.email;
+
+                listOfClientVM = db.clients.ToArray().OrderBy(x => x.Id).Select(x => new ClientVM(x)).ToList();
+
+            }
+
+            //Путь к документу вложения к письму
+          //  var pathString3 = Path.Combine(originalDirectoryWordDoc.ToString(), "DocsClient\\" + id.ToString() + "\\Document");
+           // string TestSaveDoc = $@"{pathString3}\\Result_Client_{id}.docx";
+
+
+            //устанавливаем постраничную навигацию. Номер страницы и количесто клиентов для отображения на одной странице
+            var onePageOfClients = listOfClientVM.ToPagedList(pageNumber, 5);
+
+            // через ViewBag отправляем в представления
+            ViewBag.onePageOfClients = onePageOfClients;
+
+            #region Сообщение пользователю
+            if (String.IsNullOrEmpty(emailClienta))
+            {
+                //Сообщение пользователю. с помощью темп дата
+                TempData["SM"] = "Проблеммы с EMAIL. НЕ коректные значения! Проверте правильность введных значений";
+            }
+            else if (emailClienta == null)
+            {
+                TempData["SM"] = "НЕ введен емайл";
+            }
+
+            else
+            {
+                //Сообщение пользователю. с помощью темп дата
+                TempData["SM"] = "Заявка успешно оформлена!";
+            }
+            #endregion
+
+           // TempData["SM"] = "Данная функция отключена!!";
+            workMail.SendEmailAsync(TestSaveDoc, emailClienta);
+            return RedirectToAction("GetAllClients");
+        }
+
+       public ActionResult PrintPDF(int id)
+        {
+          // WorkMail workMail = new WorkMail();
+            //tring emailClienta;
+            workingWord = new WorkingWord();
+
+            // создание ссылок дирикторий(папок для документов). Корневая папка
+            var originalDirectoryWordDoc = new DirectoryInfo(string.Format($"{Server.MapPath(@"\")}Archive_Documents\\"));
+
+            //Создается папка дл хранения дока
+            var pathString3 = Path.Combine(originalDirectoryWordDoc.ToString(), "DocsClient\\" + id.ToString() + "\\Document\\");
+            
+            // путь к самому документу
+            string TestSaveDoc = $@"{pathString3}Result_Client_{id}.pdf";
+
+            //workingWord.ConverdToBase64String(TestSaveDoc);
+
+            //ViewBag.stringBase64PrinPDF = workingWord.ConverdToBase64String(TestSaveDoc);
+            string tempSTR = workingWord.ConverdToBase64String(TestSaveDoc);
+
+
+            string tg = tempSTR.Trim("\"\"".ToCharArray());
+
+           // ViewBag.StringBase64PrinPDF = tg;
+            //ViewBag.StringBase64PrinPDF = new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(workingWord.ConverdToBase64String(TestSaveDoc));
+
+             //TempData["R"] = new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(workingWord.ConverdToBase64String(TestSaveDoc));
+            TempData["R"] = tg;
+
+
+            TempData["SM"] = "Подготовка документа к печати!!";
+
+            return RedirectToAction("GetAllClients");
+        }
+
+
+
         //ТЕСТОВОЙ МЕТОД*****
         // POST: Admin/PagesClients/AddClient
         /// <summary>
-        /// Добавление новой заыявки. В админ зоне.
+        /// Добавление новой заявки. В админ зоне.
         /// Метод Post. Пришла форма от клиента
         /// </summary>
         /// <returns></returns>
@@ -658,6 +767,7 @@ namespace RegistrationApplication.Areas.Admin.Controllers
             //переодресовываем пользователя на метод индекс
             return RedirectToAction("Index");
         }
+
 
        
     }
