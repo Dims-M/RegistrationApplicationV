@@ -17,16 +17,14 @@ namespace RegistrationApplication.Models.Utilities
     /// </summary>
     public class WorkingWord
     {
-        
-        //private static string pathDoc = "";
-
+      
        /// <summary>
        /// Создание документа форд
        /// </summary>
        /// <param name="client">Массив с данными. для записи в Word</param>
        /// <param name="paht">paht Путь к файлу. Куда сохранять</param>
        /// <param name="nameClient">Id имя клиента </param>
-        public void GetBoxCreateWord(string[] client, string paht , int nameClient)
+        public void GetBoxCreateWordAndPdf(string[] client, string paht , int nameClient)
         {
             string hedstr = @"
 Касса №1 — сеть центров выдачи займов!
@@ -61,6 +59,7 @@ kassaone.ru
                 document.Content.LoadText(hedstr);
 
                 document.Save(paht + $@"\\Result_Client_{nameClient}.docx");
+                document.Save(paht + $@"\\Result_Client_{nameClient}.pdf");
 
                 //поиск и замена Картинки.
                 ContentRange imagePlaceholder = document.Content.Find("#IMAGE").First();
@@ -73,6 +72,7 @@ kassaone.ru
 
                 //получаем разширение
                 ext = System.IO.Path.GetExtension(temp);
+                
                 //Получаем имя файла
                 tempPahtImag = System.IO.Path.GetFileName(temp);
 
@@ -84,24 +84,17 @@ kassaone.ru
                     ext != "image/png" &&
                     ext != "image/x-png")
                 { 
-                     //imagePlaceholder.Set(new Picture(document, paht + $"\\{nameClient.ToString()}{ext}").Content);
-                     //document.Save(paht + $@"\\Result_Client_{nameClient.ToString()}.docx");
                 }
 
                 string pathCopy = paht + "\\" + tempPahtImag;
-               // File.Copy($"{temp}", $"{paht}\\{nameClient}\\{tempPahtImag}", true);
                 File.Copy(temp, pathCopy, true);
 
-                //imagePlaceholder.Set(new Picture(document, paht + $"\\{nameClient.ToString()}{ext}").Content);
                 imagePlaceholder.Set(new Picture(document, paht + $"\\{tempPahtImag}").Content);
-               
-                //imagePlaceholder.Set(new Picture(document, paht + $"\\{temp}").Content);
-               
-                
+
+                //создаем документ в 2х форматах. *.docx и *.pdf
                 document.Save(paht + $@"\\Result_Client_{nameClient.ToString()}.docx");
                 document.Save(paht + $@"\\Result_Client_{nameClient.ToString()}.pdf");
-
-               // pathDoc = paht + $@"\\Result_Client_{nameClient.ToString()}.pdf";
+ 
             }
 
             catch (Exception ex)
@@ -116,16 +109,14 @@ kassaone.ru
         /// <summary>
         /// Конвертириуем пдв в строку Base64String и сохраняем в файл
         /// </summary>
+        /// <param name="pathDoc">Путь к документу который нужно преобразовать в  base64</param>
+        /// <returns></returns>
         public string ConverdToBase64String(string pathDoc)
         {
             string textFromFile;
             string b64 = null;
 
-            //var bytes = File.ReadAllBytes("rrrrtest.pdf");
-            //var base64 = Convert.ToBase64String(bytes);
-
-            // using (FileStream fstream = File.OpenRead($"222.pdf"))
-
+            //проверяем на null и "" 
             if (!string.IsNullOrWhiteSpace(pathDoc))
             {
 
@@ -142,19 +133,7 @@ kassaone.ru
 
             string sorstext = textFromFile;
             b64 = Convert.ToBase64String(Encoding.Default.GetBytes(sorstext));
-            Console.WriteLine(b64);
-
-
-
-            //using (FileStream fstream = new FileStream(@"note.txt", FileMode.OpenOrCreate))
-            //{
-            //    // преобразуем строку в байты
-            //    byte[] array = System.Text.Encoding.Default.GetBytes(b64);
-            //    // запись массива байтов в файл
-            //    fstream.Write(array, 0, array.Length);
-            //    //Console.WriteLine("Текст записан в файл");
-            //}
-
+          
                 return (b64);
             }
             else

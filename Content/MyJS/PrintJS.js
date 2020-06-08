@@ -1,8 +1,20 @@
 ﻿
-$('#myButton').click(display);
+//$('#myButton').click(display);
+//$('#myButton').click(display);
+//$('.printDoc').click(display);
+var cicle = true;
+while (cicle) {
+
+    goRocket() //запуск таймера
+};
+
+//goRocket() //запуск таймера
+var tt = $(".printDoc");
+
+tt.value;
 
 function display() {
-    alert("Будет ппроизведена печать документа!*!" +
+    alert("Будет произведена печать документа!*!" +
         "Выберите принтер, количество экземпляров и нажмите кнопку печать! ");
 
     //document.write("функция в JavaScript");
@@ -37,14 +49,66 @@ function display() {
     }
 };
 
+//Запуск таймера.
+function goRocket() {
 
+    var pdfInBase64 = document.getElementById("myButton").value.toString();
 
+    if (pdfInBase64 == "") {
+       // alert('Пустая строка');
+        countdown2(); // запускаем цикл 
+        return;
+    }
 
+    else {
+        
+  //  alert('Произошел Запуск таймера');
+    display();
+        cicle = false;
+        pdfInBase64 = "";
 
+    let timer; // пока пустая переменная
+    let x = 10; // стартовое значение обратного отсчета
 
+    countdown(); // вызов функции
 
+    function countdown() {  // функция обратного отсчета
+       // document.getElementById('rocket').innerHTML = x;
+        x--; // уменьшаем число на единицу
 
+        if (x < 0) {
+            clearTimeout(timer); // таймер остановится на нуле
+          //  alert('Стоп таймер ');
+            cicle = false;
+            //goRocket()
+        }
+        else {
+            timer = setTimeout(countdown, 1000);
+        }
+        }
 
+    }
+
+    
+
+}
+
+function countdown2() {  // функция обратного отсчета
+    let timer; // пока пустая переменная
+    let x = 10; // стартовое значение обратного отсчета
+    //document.getElementById('rocket').innerHTML = x;
+    x--; // уменьшаем число на единицу
+
+    if (x < 0) {
+        clearTimeout(timer); // таймер остановится на нуле
+       // alert('Стоп таймер ');
+        cicle = false;
+        //goRocket()
+    }
+    else {
+        timer = setTimeout(countdown, 1000);
+    }
+}
 
 //var inputTestGet  = document.getElementById('test');
 

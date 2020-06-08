@@ -16,57 +16,11 @@ namespace RegistrationApplication.Models.Utilities
     public  class WorkMail
     {
 
-        /// <summary>
-        /// Отправка почты клиенту
-        /// </summary>
-        /// <param name="pathAttachments">Вложение(документов) к письму</param>
-        /// <param name="Toemail">Кому отправляем</param>
-        /// <returns></returns>
-        //public async Task SendEmailAsync(string pathAttachments, string Toemail)
-        //{
-        //    try
-        //    {
-
-        //    //от кого
-        //    MailAddress from = new MailAddress("o.avto@i-cks.ru", "Информационное оповещение");
-
-        //    //кому
-        //    //MailAddress to = new MailAddress("o.avto@i-cks.ru");
-        //    MailAddress to = new MailAddress(Toemail);
-
-        //    MailMessage m = new MailMessage(from, to);
-
-        //    //Вложение. Например документ
-        //    m.Attachments.Add(new Attachment(pathAttachments));
-
-        //    // Имя сообщения
-        //    m.Subject = "Заявка на кредит!";
-        //    //Тело сообщения. Сам текс письма
-        //    m.Body = "Касса №1 — сеть центров выдачи займов!" +
-        //              "Сформирована ваша заявка на кредит." +
-        //              "Подробности в документе.";
-
-        //    //настройки электронного ящика
-        //    SmtpClient smtp = new SmtpClient("smtp.mail.ru", 2525);
-        //    //Логин и Пароль от почты
-        //    smtp.Credentials = new NetworkCredential("o.avto@i-cks.ru", "51215045avto");
-
-        //    // Использовать ли защиту  Ssl
-        //   smtp.EnableSsl = true;
-
-        //        //отправка
-        //        await smtp.SendMailAsync(m);
-        //        // Console.WriteLine("Письмо отправлено");
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        var t = ex.ToString();
-        //    }
-
-
-        //}
-
+       /// <summary>
+       /// Отправка клиенту письма с данными заявки
+       /// </summary>
+       /// <param name="pathAttachments">Файл вложения</param>
+       /// <param name="Toemail">Email клиента</param>
         public void SendEmailAsync(string pathAttachments, string Toemail)
         {
             try
