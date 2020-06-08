@@ -118,7 +118,6 @@ namespace RegistrationApplication.Areas.Admin.Controllers
 
             }
 
-
             // ЗАГРУЗКА ФАЙЛА
             #region Загрузка файла
 
@@ -214,6 +213,7 @@ namespace RegistrationApplication.Areas.Admin.Controllers
 
             //Сообщение пользователю. с помощью темп дата
             TempData["SM"] = "Заявка успешно оформлена!";
+            CreateDocWordOfPdf(id); // создаем 2 типа докуентов. Word и Pdf
             //переодрисовать пользователя
             return RedirectToAction("GetAllClients");
         }
@@ -223,7 +223,7 @@ namespace RegistrationApplication.Areas.Admin.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async System.Threading.Tasks.Task<ActionResult> GetAllClients(int? page, int? catId)
+        public async System.Threading.Tasks.Task<ActionResult> GetAllClients(int? page)
         {
             //лист для хранения клиентов
             List<ClientVM> listOfClientVM;
@@ -253,69 +253,18 @@ namespace RegistrationApplication.Areas.Admin.Controllers
             // через ViewBag отправляем в представления
             ViewBag.onePageOfClients = onePageOfClients;
 
-            //ViewBag.stringBase64PrinPDF = WorkingWord.ConverdToBase64String();
-
             // Получаем имя директории
             string t = originalDirectory.ToString();
-           // tempDoc = t;
-           // workingWord.GetBoxCreateWordAndPdf(t);
-
-            //  await workMail.SendEmailAsync(t + @"\\TestSaveDoc.docx"); // отправка письма
            
             // Возращаем представление с данными
             return View(listOfClientVM);
         }
 
-        /// <summary>
-        /// Отправить клиенту отчет о заявке в формате Word 
-        /// </summary>
-        /// <returns></returns>
-        public FileResult DownloadResultDocument( int id )
-        {
-            workingWord = new WorkingWord(); // сохранение файлов на диске
-
-            // создание ссылок дирикторий(папок для документов). Корневая папка
-            var originalDirectory = new DirectoryInfo(string.Format($"{Server.MapPath(@"\")}Archive_Documents\\"));
-
-            ////Создается папка к кажому новому клиенту(по id).
-            var pathString1 = Path.Combine(originalDirectory.ToString(), "DocsClient");
-            var pathString2 = Path.Combine(originalDirectory.ToString(), "DocsClient\\" + id.ToString());
-            
-            //Создается папка дл хранения уменьшеной копии
-            var pathString3 = Path.Combine(originalDirectory.ToString(), "DocsClient\\" + id.ToString() + "\\Document");
-
-            //Проверяем наличие директории (если нет, создаем)
-            if (!Directory.Exists(pathString1))
-                Directory.CreateDirectory(pathString1);
-            if (!Directory.Exists(pathString2))
-                Directory.CreateDirectory(pathString2);
-            if (!Directory.Exists(pathString3))
-                Directory.CreateDirectory(pathString3);
-       
-            // Тип файла - content-type
-            string file_type = "application/docx";
-            // Имя файла - необязательно
-            string TestSaveDoc = $@"{pathString3}\\Result_Client_{id}.docx";
-            string TestSaveDocPDF = $@"{pathString3}\\Result_Client_{id}.pdf";
-
-            //Массив с данными
-            var tempRezul = PrintDocPdf(id);
-
-            //Запись в документ ворд
-            workingWord.GetBoxCreateWordAndPdf(tempRezul, pathString3, id);
-
-            //  workingWord.ConverdToBase64String(TestSaveDocPDF);
-
-
-            //Отправляем готовый документ клиенту
-           return File(TestSaveDoc, file_type, $"Сustomer_card№{id}.docx");
-
-        }
-
 
         /// <summary>
-        /// Создание документа Ворд и PDF
+        /// Создание документа Ворд и PDF при создании(редактровании) заявки
         /// </summary>
+        /// <param name="id">ID нужного клиента</param>
         public void CreateDocWordOfPdf(int id)
         {
             workingWord = new WorkingWord(); // сохранение файлов на диске
@@ -338,19 +287,11 @@ namespace RegistrationApplication.Areas.Admin.Controllers
             if (!Directory.Exists(pathString3))
                 Directory.CreateDirectory(pathString3);
 
-            // Тип файла - content-type
-            string file_type = "application/docx";
-            // Имя файла - необязательно
-            string TestSaveDoc = $@"{pathString3}\\Result_Client_{id}.docx";
-            string TestSaveDocPDF = $@"{pathString3}\\Result_Client_{id}.pdf";
+            //Массив с готовыми данными о заявке
+            var tempRezul = CreatingDataArray(id);
 
-            //Массив с данными
-            var tempRezul = PrintDocPdf(id);
-
-            //Запись в документ ворд
+            //Запись(создание) в документ ворд
             workingWord.GetBoxCreateWordAndPdf(tempRezul, pathString3, id);
-
-            //  workingWord.ConverdToBase64String(TestSaveDocPDF);
 
         }
 
@@ -360,18 +301,18 @@ namespace RegistrationApplication.Areas.Admin.Controllers
         /// </summary>
         /// <param name="id">id клиента. Поиск по БД</param>
         /// <returns></returns>
-        public string[] PrintDocPdf( int id)
+        public string[] CreatingDataArray( int id)
         {
-            //модель или лист для хранения
-            Client Clinentlist = new Client();
-        
+            
+            //Массив для хранения данных о зоявке
+            string[] listDoc2 = null;
+
             // Подклбчение к бд и поиск по id
             using (DBContext db = new DBContext())
             {
-                Clinentlist = db.clients.Find(id);
-               
-            }
-            string[] listDoc2= new string[]
+              var  Clinentlist = db.clients.Find(id);
+              
+            listDoc2= new string[]
             {
                 $"Номер заявки {Clinentlist.Id}",
                 $"ФАМИЛИЯ: {Clinentlist.lastName}",
@@ -384,6 +325,9 @@ namespace RegistrationApplication.Areas.Admin.Controllers
                 $"КАРТИНКА:\n{Clinentlist.image}",
                 $"#IMAGE"
             };
+
+            }
+
             // отправка готового массива в контролер печати
             return listDoc2;
 
@@ -602,10 +546,7 @@ namespace RegistrationApplication.Areas.Admin.Controllers
             // путь к самому документу
             string TestSaveDoc = $@"{pathString6}Result_Client_{id}.pdf";
 
-            //workingWord.ConverdToBase64String(TestSaveDoc);
-
-            //ViewBag.stringBase64PrinPDF = workingWord.ConverdToBase64String(TestSaveDoc);
-            //  string tempSTR = workingWord.ConverdToBase64String(TestSaveDoc);
+            //Создание отредактированых документов.
            CreateDocWordOfPdf(id);
 
             //Переодрeсовать пользователя
@@ -673,31 +614,37 @@ namespace RegistrationApplication.Areas.Admin.Controllers
         /// </summary>
         /// <param name="id">Id клиента</param>
         /// <returns></returns>
+     
         public ActionResult SendMailClient(int id)
         {
+
+           CreateDocWordOfPdf(id); //Создания нового экземпляяра документов
+
             WorkMail workMail = new WorkMail();
             string emailClienta;
-            workingWord = new WorkingWord();
+            //workingWord = new WorkingWord();
 
             // создание ссылок дирикторий(папок для документов). Корневая папка
             var originalDirectoryWordDoc = new DirectoryInfo(string.Format($"{Server.MapPath(@"\")}Archive_Documents\\"));
 
-            //Создается папка дл хранения дока
+            ////Создается папка дл хранения дока
             var pathString3 = Path.Combine(originalDirectoryWordDoc.ToString(), "DocsClient\\" + id.ToString() + "\\Document\\");
 
             string TestSaveDoc = $@"{pathString3}Result_Client_{id}.docx";
-            //Массив с данными
-            var tempRezul = PrintDocPdf(id);
 
-            //Запись в документ ворд
-            workingWord.GetBoxCreateWordAndPdf(tempRezul, pathString3, id);
-          
+            //Массив с данными
+            var tempRezul = CreatingDataArray(id);
+
+            ////Запись в документ ворд
+            //workingWord.GetBoxCreateWordAndPdf(tempRezul, pathString3, id);
+
             //лист для хранения клиентов
             List<ClientVM> listOfClientVM;
             int page = 1;
 
             //установить номер старницы
-            var pageNumber = page ; // Если в  перемнной page Будет значение null. То по умолчанию устновится страница 1
+            var pageNumber = page; // Если в  перемнной page Будет значение null. То по умолчанию устновится страница 1
+          
             using (DBContext db = new DBContext())
             {
                 Client client = new Client();
@@ -708,16 +655,16 @@ namespace RegistrationApplication.Areas.Admin.Controllers
 
             }
 
-            //Путь к документу вложения к письму
-          //  var pathString3 = Path.Combine(originalDirectoryWordDoc.ToString(), "DocsClient\\" + id.ToString() + "\\Document");
-           // string TestSaveDoc = $@"{pathString3}\\Result_Client_{id}.docx";
+           // Путь к документу вложения к письму
+            //var pathString3 = Path.Combine(originalDirectoryWordDoc.ToString(), "DocsClient\\" + id.ToString() + "\\Document");
+            //string TestSaveDoc = $@"{pathString3}\\Result_Client_{id}.docx";
 
 
-            //устанавливаем постраничную навигацию. Номер страницы и количесто клиентов для отображения на одной странице
-            var onePageOfClients = listOfClientVM.ToPagedList(pageNumber, 5);
+            ////устанавливаем постраничную навигацию. Номер страницы и количесто клиентов для отображения на одной странице
+            //var onePageOfClients = listOfClientVM.ToPagedList(pageNumber, 5);
 
-            // через ViewBag отправляем в представления
-            ViewBag.onePageOfClients = onePageOfClients;
+            //// через ViewBag отправляем в представления
+            //ViewBag.onePageOfClients = onePageOfClients;
 
             #region Сообщение пользователю
             if (String.IsNullOrEmpty(emailClienta))
@@ -739,13 +686,13 @@ namespace RegistrationApplication.Areas.Admin.Controllers
 
            // TempData["SM"] = "Данная функция отключена!!";
             workMail.SendEmailAsync(TestSaveDoc, emailClienta);
+
             return RedirectToAction("GetAllClients");
         }
 
+      
        public ActionResult PrintPDF(int id)
         {
-          // WorkMail workMail = new WorkMail();
-            //tring emailClienta;
             workingWord = new WorkingWord();
 
             // создание ссылок дирикторий(папок для документов). Корневая папка
@@ -757,29 +704,68 @@ namespace RegistrationApplication.Areas.Admin.Controllers
             // путь к самому документу
             string TestSaveDoc = $@"{pathString3}Result_Client_{id}.pdf";
 
-            //workingWord.ConverdToBase64String(TestSaveDoc);
           //Создание новых документов ворд
             CreateDocWordOfPdf(id);
 
-            //ViewBag.stringBase64PrinPDF = workingWord.ConverdToBase64String(TestSaveDoc);
             string tempSTR = workingWord.ConverdToBase64String(TestSaveDoc);
 
-
+            //убираем лишние ковычки из строки 
             string tg = tempSTR.Trim("\"\"".ToCharArray());
 
-           // ViewBag.StringBase64PrinPDF = tg;
-            //ViewBag.StringBase64PrinPDF = new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(workingWord.ConverdToBase64String(TestSaveDoc));
-
-             //TempData["R"] = new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(workingWord.ConverdToBase64String(TestSaveDoc));
             TempData["R"] = tg;
-
 
             TempData["SM"] = "Подготовка документа к печати!!";
 
             return RedirectToAction("GetAllClients");
         }
 
+        //****НУЖНО подумать как исправить
+        /// <summary>
+        /// Отправить клиенту отчет о заявке в формате Word 
+        /// </summary>
+        /// <returns></returns>
+        public FileResult DownloadResultDocument(int id)
+        {
+            workingWord = new WorkingWord(); // сохранение файлов на диске
 
+            // создание ссылок дирикторий(папок для документов). Корневая папка
+            var originalDirectory = new DirectoryInfo(string.Format($"{Server.MapPath(@"\")}Archive_Documents\\"));
+
+            ////Создается папка к кажому новому клиенту(по id).
+            var pathString1 = Path.Combine(originalDirectory.ToString(), "DocsClient");
+            var pathString2 = Path.Combine(originalDirectory.ToString(), "DocsClient\\" + id.ToString());
+
+            //Создается папка дл хранения уменьшеной копии
+            var pathString3 = Path.Combine(originalDirectory.ToString(), "DocsClient\\" + id.ToString() + "\\Document");
+
+            //Проверяем наличие директории (если нет, создаем)
+            if (!Directory.Exists(pathString1))
+                Directory.CreateDirectory(pathString1);
+            if (!Directory.Exists(pathString2))
+                Directory.CreateDirectory(pathString2);
+            if (!Directory.Exists(pathString3))
+                Directory.CreateDirectory(pathString3);
+
+            // Тип файла - content-type
+            string file_type = "application/docx";
+            // Имя файла - необязательно
+            string TestSaveDoc = $@"{pathString3}\\Result_Client_{id}.docx";
+           
+            //Массив с данными
+            var tempRezul = CreatingDataArray(id);
+
+            //Запись в документ ворд
+            workingWord.GetBoxCreateWordAndPdf(tempRezul, pathString3, id);
+
+            //Отправляем готовый документ клиенту на скачку
+            return File(TestSaveDoc, file_type, $"Сustomer_card№{id}.docx");
+
+        }
+
+
+
+        //ТЕСТОВЫЕ МЕТОДЫ, НЕ ИСПОЛЬЗОВАТЬ!!
+        #region тестовые методы
 
         //ТЕСТОВОЙ МЕТОД*****
         // POST: Admin/PagesClients/AddClient
@@ -840,7 +826,8 @@ namespace RegistrationApplication.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
+        #endregion
 
-       
+
     }
 }
