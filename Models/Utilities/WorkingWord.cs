@@ -24,7 +24,7 @@ namespace RegistrationApplication.Models.Utilities
        /// <param name="client">Массив с данными. для записи в Word</param>
        /// <param name="paht">paht Путь к файлу. Куда сохранять</param>
        /// <param name="nameClient">Id имя клиента </param>
-        public void GetBoxCreateWordAndPdf(string[] client, string paht , int nameClient)
+        public void GetBoxCreateWordAndPdf(string[] client, string paht , int IdClient)
         {
             string hedstr = @"
 Касса №1 — сеть центров выдачи займов!
@@ -58,8 +58,8 @@ kassaone.ru
 
                 document.Content.LoadText(hedstr);
 
-                document.Save(paht + $@"\\Result_Client_{nameClient}.docx");
-                document.Save(paht + $@"\\Result_Client_{nameClient}.pdf");
+                document.Save(paht + $@"\\Result_Client_{IdClient}.docx");
+                document.Save(paht + $@"\\Result_Client_{IdClient}.pdf");
 
                 //поиск и замена Картинки.
                 ContentRange imagePlaceholder = document.Content.Find("#IMAGE").First();
@@ -67,7 +67,7 @@ kassaone.ru
                 //дергаем из Бд имя и путь картнки
                 using (DBContext db = new DBContext())
                 {
-                    temp = db.clients.Find(nameClient).imagePathInDoc;
+                    temp = db.clients.Find(IdClient).imagePathInDoc;
                 }
 
                 //получаем разширение
@@ -92,8 +92,8 @@ kassaone.ru
                 imagePlaceholder.Set(new Picture(document, paht + $"\\{tempPahtImag}").Content);
 
                 //создаем документ в 2х форматах. *.docx и *.pdf
-                document.Save(paht + $@"\\Result_Client_{nameClient.ToString()}.docx");
-                document.Save(paht + $@"\\Result_Client_{nameClient.ToString()}.pdf");
+                document.Save(paht + $@"\\Result_Client_{IdClient.ToString()}.docx");
+                document.Save(paht + $@"\\Result_Client_{IdClient.ToString()}.pdf");
  
             }
 

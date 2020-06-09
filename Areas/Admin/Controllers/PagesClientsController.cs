@@ -691,6 +691,11 @@ namespace RegistrationApplication.Areas.Admin.Controllers
         }
 
       
+        /// <summary>
+        /// Получаем маасив пдв с данными клиента
+        /// </summary>
+        /// <param name="id"> id клиента.</param>
+        /// <returns></returns>
        public ActionResult PrintPDF(int id)
         {
             workingWord = new WorkingWord();
@@ -825,6 +830,44 @@ namespace RegistrationApplication.Areas.Admin.Controllers
             //переодресовываем пользователя на метод индекс
             return RedirectToAction("Index");
         }
+
+
+
+        /// <summary>
+        /// тяестовой метод Получаем маасив пдв2 с данными клиента
+        /// </summary>
+        /// <param name="id"> id клиента.</param>
+        /// <returns></returns>
+        public ActionResult PrintPDF2(int id)
+        {
+            workingWord = new WorkingWord();
+
+            // создание ссылок дирикторий(папок для документов). Корневая папка
+            var originalDirectoryWordDoc = new DirectoryInfo(string.Format($"{Server.MapPath(@"\")}Archive_Documents\\"));
+
+            //Создается папка дл хранения дока
+            var pathString3 = Path.Combine(originalDirectoryWordDoc.ToString(), "DocsClient\\" + id.ToString() + "\\Document\\");
+
+            // путь к самому документу
+            string TestSaveDoc = $@"{pathString3}Result_Client_{id}.pdf";
+
+            //Создание новых документов ворд
+            CreateDocWordOfPdf(id);
+
+            string tempSTR = workingWord.ConverdToBase64String(TestSaveDoc);
+
+            //убираем лишние ковычки из строки 
+            string tg = tempSTR.Trim("\"\"".ToCharArray());
+
+            //TempData["R"] = tg;
+
+            //TempData["SM"] = "Подготовка документа к печати!!";
+
+            // return RedirectToAction("GetAllClients");
+            return Content(tg);
+        }
+
+
 
         #endregion
 

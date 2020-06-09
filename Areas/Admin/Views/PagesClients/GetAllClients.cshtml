@@ -114,41 +114,74 @@
                 @Html.ActionLink("Cкачать заявку", "DownloadResultDocument", new { id = client.Id }, new { @class = "btn btn-primary" })
                 @Html.ActionLink("Получить на Email", "SendMailClient", new { id = client.Id }, new { @class = "btn btn-primary" })
 
-                @Html.ActionLink("Распечатать", "PrintPDF", new { id = client.Id }, new { @class = "btn btn-primary" })
+                @*@Html.ActionLink("Распечатать", "PrintPDF", new { id = client.Id }, new { @class = "btn btn-primary" })*@
                 @*@Html.ActionLink("Печать2", "PrintPDF", new { id = client.Id }, new { onclick = "$('#formid').submit();" }, new { @class = "btn btn-primary" })*@
-               
+
 
                 @*<ul class="products" >
             <li data-product-id="@TempData["R"]">111111</li>
         </ul>*@
+                @*<form id="Button4Pressed" action="@Url.Action("PagesClients", "PrintPDF2")" method="post"></form>*@
+                @* <a href="#" onclick="javascript:document.getElementById('PrintPDF2').submit()">*@
+                @*Тестовая печать из метода /a>*@
 
+              
+                @*<div id="bestbook">*@
+
+                @*//не видимый  iframe*@
+                <div id="print-content">
+                    @*<iframe style="display: none;" id="FileFrame" src="~/Archive_Documents/DocsClient/20/Document/Result_Client_20.pdf">></iframe>*@
+                    <iframe style="display: none;" name="fileFrame" id="fileFrame" src="~/Archive_Documents/DocsClient/20/Document/Result_Client_20.pdf">></iframe>
+                </div>
+
+                @*<a onClick="javascript:CallPrint('print-content');" title="Распечатать проект">Распечатать</a>*@
+                <input type="button" value="Печать Doc"  class = "btn btn-primary" onClick="javascript:CallPrint('fileFrame');">
+
+                @*//получаем строку с массивом пдф*@
+                @*<div>
+                    @Ajax.ActionLink("Печать док", "PrintPDF2", new { id = client.Id },
+                            new AjaxOptions
+                                 {
+                                UpdateTargetId = "bestbook",
+                                Confirm = "Выполнить AJAX-запрос?"
+                            })
+                </div>*@
+
+
+                @*//Рабочий код*@
                 <div>
                     <form name="search">
-
-                        @*<input type="button" id="myButton" name="print" value="test" class="btn btn-primary printBlock" />*@
-
-                        @*<input type="button" id="myButton1" name="print" value="Печать Doc1" class="btn btn-primary printBlock" />*@
-                        @*<input type="button"  id="myButton" name="print" value=@TempData["R"] class="btn btn-primary printBlock" />*@
-
                         <input type="hidden" id="myButton" name="print" value=@TempData["R"] class="btn btn-primary printBlock" />
-
-                        @*<input type="button" id="myButton" name="print" value="@ViewBag.StringBase64PrinPDF" class="btn btn-primary printBlock" />*@
-                        @*<input id="test" type="hidden" value=@ViewBag.Result />*@
                     </form>
                 </div>
             </td>
         </tr>
     }
 
+
+
 </table>
 
+<script>
+    
+</script>
 
 @Html.PagedListPager((IPagedList)ViewBag.onePageOfClients, page => Url.Action("GetAllClients", new { page }))
+
+@Scripts.Render("~/scripts/jquery-3.5.1.min.js")
+@Scripts.Render("~/scripts/jquery.unobtrusive-ajax.min.js")
 @section Scripts
 {
     <script type="text/javascript">
        // $('#myButton').click(display);
 
+
+
+         @*var SomeUrlVar = {
+             URL: '@Url.ActionLink("PagesClients", "PrintPDF2")'
+    }*@
+
+    //showTable(someUrlVar);
 
         // $('.products li').click(display2);
         //$('#myButton1').click(display);
