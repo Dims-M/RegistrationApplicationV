@@ -1,9 +1,9 @@
 ﻿
-//var cicle = true;
-//while (cicle) {
+var cicle = true;
+while (cicle) {
 
-//   goRocket() //запуск таймера
-//};
+   goRocket() //запуск таймера
+};
 
 //goRocket() //запуск таймера
 var tt = $(".printDoc");
@@ -80,40 +80,30 @@ function goRocket() {
 
 }
 
-//Запуск печати документа ПРИХОДИТ ССЫЛКА на первый из списка pdf документ.
-function CallPrint(strid, id) {
+//Запуск печати документа
+function CallPrint(strid) {
+    var prtContent = document.getElementById(strid);
+    //var prtCSS = '<link rel="stylesheet" href="/templates/css/template.css" type="text/css" />';
+    //var WinPrint = window.open('', '', 'left=50,top=50,width=800,height=640,toolbar=0,scrollbars=1,status=0');
+    //WinPrint.document.write('<div id="print" class="contentpane">');
+    //WinPrint.document.write(prtCSS);
+    //WinPrint.document.write(prtContent.innerHTML);
+    //WinPrint.document.write('</div>');
+    //WinPrint.document.close();
 
-    let a = "fileFrame" + id;
-   
-    var prtContent = document.getElementsByName(strid) ;
+    window.frames["fileFrame"].focus();
+    window.frames["fileFrame"].print();
 
-
-    //получить id документа
-    for (var i = 0; i < prtContent.length; i++) {
-
-        if (a == prtContent[i].id) {
-
-            var ttt = prtContent[i].id;
-
-            //window.parent.frames["fileFrame"].focus();
-            //window..parent.frames["fileFrame"].print();
-
-            window.frames[i].focus();
-            window.frames[i].print();
-
-            WinPrint.focus();
-            WinPrint.onload = () => {
-                WinPrint.print();
-            }
-        }
-
-        else {
-         
-        }
-        
-     // window.location.reload();
+    WinPrint.focus();
+    WinPrint.onload = () => {
+        WinPrint.print();
     }
 
+    //WinPrint.print();
+    //alert("Gtxfnm");
+    //WinPrint.close();
+
+    //prtContent.innerHTML = strOldOne;
 }
 
 //тестовой запуск метода из контролера

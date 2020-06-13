@@ -91,11 +91,11 @@
 
                 @if (client.PdfPathInDoc == null)
                 {
-                    @client.PdfPathInDoc
+                    @*@client.PdfPathInDoc*@
                 }
                 else
                 {
-                    <iframe style="display: none;" name="fileFrame" id="fileFrame" src="~/Archive_Documents/DocsClient/@client.Id/Document/@client.PdfPathInDoc">></iframe>
+                    @*<iframe sandbox="allow-modals" style="display: none;" name="fileFrame" id="fileFrame@(client.id)" src="~/Archive_Documents/DocsClient/@client.Id/Document/@client.PdfPathInDoc">></iframe>*@
 
                 }
 
@@ -123,15 +123,15 @@
                 @*@Html.ActionLink("Подробности", "Details", new { id = client.Id }, new { @class = "btn btn-primary" }) |*@
                 @Html.ActionLink("Удалить заявку", "DeleteClient", new { id = client.Id }, new { @class = "btn btn-danger delete" })
                 @Html.ActionLink("Cкачать заявку", "DownloadResultDocument", new { id = client.Id }, new { @class = "btn btn-primary" })
-               @Html.ActionLink("Получить на Email", "SendMailClient", new { id = client.Id }, new { @class = "btn btn-primary" })
+                @Html.ActionLink("Получить на Email", "SendMailClient", new { id = client.Id }, new { @class = "btn btn-primary" })
 
                 @*@Html.ActionLink("Распечатать", "PrintPDF", new { id = client.Id }, new { @class = "btn btn-primary" })*@
                 @*@Html.ActionLink("Печать2", "PrintPDF", new { id = client.Id }, new { onclick = "$('#formid').submit();" }, new { @class = "btn btn-primary" })*@
 
 
                 @*<ul class="products" >
-            <li data-product-id="@TempData["R"]">111111</li>
-        </ul>*@
+                        <li data-product-id="@TempData["R"]">111111</li>
+                    </ul>*@
                 @*<form id="Button4Pressed" action="@Url.Action("PagesClients", "PrintPDF2")" method="post"></form>*@
                 @* <a href="#" onclick="javascript:document.getElementById('PrintPDF2').submit()">*@
                 @*Тестовая печать из метода /a>*@
@@ -141,40 +141,26 @@
 
                 @*//не видимый  iframe*@
                 <div id="print-content">
-                    @*<iframe style="display: none;" id="FileFrame" src="~/Archive_Documents/DocsClient/20/Document/Result_Client_20.pdf">></iframe>*@
-                    @*<iframe style="display: none;" name="fileFrame" id="fileFrame" src="~/Archive_Documents/DocsClient/20/Document/Result_Client_20.pdf">></iframe>*@
+
+                    @*//Раьочий вариан*@
                     @*<iframe style="display: none;" name="fileFrame" id="fileFrame" src="~/Archive_Documents/DocsClient/@client.Id/Document/@client.PdfPathInDoc">></iframe>*@
-                    @*<iframe style="display: none;" name="fileFrame" id="fileFrame" src="@client.PdfPathInDoc">></iframe>*@
-
-                    @* <iframe style="display: none;" name="fileFrame" id="fileFrame" src="~/Archive_Documents/DocsClient/1018/Document/Result_Client_1018.pdf">></iframe>*@
-                    @*//Рабочий вариан*@
-                    @*<iframe style="display: none;" name="fileFrame" id="fileFrame" src="~/Archive_Documents/DocsClient/@client.Id/Document/@client.PdfPathInDoc">></iframe>*@
-                    @*<iframe  name="fileFrame" id="fileFrame" src="~/Archive_Documents/DocsClient/@client.Id/Document/@client.PdfPathInDoc">></iframe>*@
-
-                    @*Тестовой метод. iframe НЕ скрыт *@
-                    @*<iframe name="fileFrame" id="fileFrame" src="~/Archive_Documents/DocsClient/@client.Id/Document/@client.PdfPathInDoc">></iframe>*@
-                    <iframe name="fileFrame" id="fileFrame@(client.Id)" src="~/Archive_Documents/DocsClient/@client.Id/Document/@client.PdfPathInDoc">></iframe>
-
+                    //
+                    @*<iframe sandbox="allow-modals" style="display: none;" name="fileFrame" id="fileFrame@(client.id)" src="~/Archive_Documents/DocsClient/@client.Id/Document/@client.PdfPathInDoc">></iframe>*@
 
                 </div>
 
 
-
-                @*<input type="button" value="Печать Doc" class="btn btn-primary" onClick="javascript:CallPrint('fileFrame') ;">*@
-
-                <input type="button" value="Печать Doc" class="btn btn-primary" onClick="javascript:CallPrint('fileFrame','@(client.Id)' ) ;">
-                @Html.DropDownList("countires", new SelectList(new string[] { "Шаблон", "Шаблон LIte", "Шаблон 2", "Шаблон 4" }), "Шаблоны документов", new { @class = "btn btn-primary" })
-                @*<input type="button" value="Печать Doc" class="btn btn-primary" onClick="javascript:changeIframe ;">*@
+                <input type="button" value="Печать Doc" class="btn btn-primary" onClick="javascript:CallPrint('fileFrame');">
 
                 @*//получаем строку с массивом пдф*@
                 @*<div>
-            @Ajax.ActionLink("Печать док", "PrintPDF2", new { id = client.Id },
-                    new AjaxOptions
-                         {
-                        UpdateTargetId = "bestbook",
-                        Confirm = "Выполнить AJAX-запрос?"
-                    })
-        </div>*@
+                        @Ajax.ActionLink("Печать док", "PrintPDF2", new { id = client.Id },
+                                new AjaxOptions
+                                     {
+                                    UpdateTargetId = "bestbook",
+                                    Confirm = "Выполнить AJAX-запрос?"
+                                })
+                    </div>*@
 
 
                 @*//Рабочий код*@
@@ -202,60 +188,7 @@
 @section Scripts
 {
     <script type="text/javascript">
-       // $('#myButton').click(display);
-
-        //var myBtn = document.getElementById('print');
-        //var myIframe = document.getElementById('fileFrame');
-        //var h1Title = document.getElementById('h1Title');
-
-        //myBtn.addEventListener('button', changeIframe);
-
-        function changeIframe() {
-
-            var myBtn = document.getElementById('print');
-            var myIframe = document.getElementById('fileFrame');
-            var h1Title = document.getElementById('h1Title');
-
-            myIframe.id = "myIframe+1";
-            //myIframe.contentDocument.title = 'New title!';
-            //h1Title.textContent = 'New Title!2';
-            //h1Title.textContent = myIframe.id;
-
-        }
-
-         @*var SomeUrlVar = {
-             URL: '@Url.ActionLink("PagesClients", "PrintPDF2")'
-    }*@
-
-    //showTable(someUrlVar);
-
-        // $('.products li').click(display2);
-        //$('#myButton1').click(display);
-        // $('#test').click(display);
-
-        //$('.products li').on('click', function () {
-        //    console.log($(this).data('product-id'));  // 55
-        //});
-
-        //Function goRocket() {
-        //    alert('Произошел Запуск таймера');
-
-        //    let timer; // пока пустая переменная
-        //    let x = 10; // стартовое значение обратного отсчета
-
-        //    countdown(); // вызов функции
-        //    function countdown() {  // функция обратного отсчета
-        //        document.getElementById('rocket').innerHTML = x;
-        //        x--; // уменьшаем число на единицу
-        //        if (x < 0) {
-        //            clearTimeout(timer); // таймер остановится на нуле
-        //            alert('Стоп таймер ');
-        //        }
-        //        else {
-        //            timer = setTimeout(countdown, 1000);
-        //        }
-        //    };
-        //};
+       
 
     </script>
 

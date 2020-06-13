@@ -179,6 +179,8 @@ namespace RegistrationApplication.Areas.Admin.Controllers
                 //переменная для хранения имени изображения
                 string imageName = file.FileName;
                 int idDocWord = id;
+                string docPdf =  $@"\\Result_Client_{idDocWord.ToString()}.pdf"; ;
+               
              
                 //Назначить пути к оригинальному и уменьшеному изабражению
                 var path = string.Format($"{pathString2}\\{imageName}");
@@ -199,10 +201,17 @@ namespace RegistrationApplication.Areas.Admin.Controllers
                 using (DBContext db = new DBContext())
                 {
                     string tempPath = $"{path3}\\{imageName}";
+                    string tempPathPDf = $"{pathString6}\\{imageName}";
 
-                    Client dto = db.clients.Find(id);
+
+                    Client dto = db.clients.Find(idDocWord);
                     dto.image = imageName;
                     dto.imagePathInDoc = tempPath; // сохраняем путь к файлу
+                    dto.pdfPathInDoc= docPdf; //имя файла 
+
+                    // создания файла пдв и док
+                    CreateDocWordOfPdf(id);
+                    // dto.pdfPathInDoc = 
 
                     db.SaveChanges();
                 }
@@ -767,6 +776,48 @@ namespace RegistrationApplication.Areas.Admin.Controllers
 
         }
 
+
+        /// <summary>
+        /// Отправить клиенту отчет о заявке в формате PDF 
+        /// </summary>
+        /// <returns></returns>
+        public FileResult DownloadResultDocumentPDF(int id)
+        {
+            workingWord = new WorkingWord(); // сохранение файлов на диске
+
+            //// создание ссылок дирикторий(папок для документов). Корневая папка
+            var originalDirectory = new DirectoryInfo(string.Format($"{Server.MapPath(@"\")}Archive_Documents\\"));
+
+            //////Создается папка к кажому новому клиенту(по id).
+            //var pathString1 = Path.Combine(originalDirectory.ToString(), "DocsClient");
+            //var pathString2 = Path.Combine(originalDirectory.ToString(), "DocsClient\\" + id.ToString());
+
+            //Создается папка дл хранения уменьшеной копии
+            var pathString3 = Path.Combine(originalDirectory.ToString(), "DocsClient\\" + id.ToString() + "\\Document");
+
+            ////Проверяем наличие директории (если нет, создаем)
+            //if (!Directory.Exists(pathString1))
+            //    Directory.CreateDirectory(pathString1);
+            //if (!Directory.Exists(pathString2))
+            //    Directory.CreateDirectory(pathString2);
+            //if (!Directory.Exists(pathString3))
+            //    Directory.CreateDirectory(pathString3);
+
+            //// Тип файла - content-type
+            string file_type = "application/docx";
+            // Имя файла - необязательно
+            string TestSaveDoc = $@"{pathString3}\\Result_Client_{id}.docx";
+
+            ////Массив с данными
+            //var tempRezul = CreatingDataArray(id);
+
+            ////Запись в документ ворд
+            //workingWord.GetBoxCreateWordAndPdf(tempRezul, pathString3, id);
+
+            //Отправляем готовый документ клиенту на скачку
+            return File(TestSaveDoc, file_type, $"Result_Client_{id}.docx");
+
+        }
 
 
         //ТЕСТОВЫЕ МЕТОДЫ, НЕ ИСПОЛЬЗОВАТЬ!!
